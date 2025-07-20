@@ -1,0 +1,45 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langchain-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: langchain-backend
+  template:
+    metadata:
+      labels:
+        app: langchain-backend
+    spec:
+      containers:
+        - name: langchain-backend
+          image: langchain-backend:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              value: "db"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "password"
+            - name: DB_NAME
+              value: "langchain_db"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: langchain-backend
+spec:
+  selector:
+    app: langchain-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer
